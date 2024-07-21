@@ -2,6 +2,8 @@ title: Thinking, Writing, and.
 description: 했던 일들과 하고 있는 일들과 하고 싶은 일들에 대해서 씁니다
 
 theme: jekyll-theme-minimal
+baseurl: ""
+url: "https://dhihm.github.io"
 
 # debug:
 #   compress: true
