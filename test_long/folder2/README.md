@@ -1,3 +1,3 @@
-# I'm folder2
+# HW Accelerator
 
 source: `{{ page.path }}`
