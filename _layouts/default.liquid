@@ -22,6 +22,7 @@ layout: tasks/compress
         {%- include templates/sidebar.liquid -%}
         {%- include templates/content.liquid -%}
         {%- include templates/addons.liquid -%}
+        {%- include extra/body.html -%}
 
         <!-- Utterances 댓글 시스템 추가 -->
         <div id="utterances-comments"></div>
@@ -34,7 +35,6 @@ layout: tasks/compress
                 async>
         </script>
 
-        {%- include extra/body.html -%}
         {%- include rest/script.liquid -%}
         {%- include common/mermaid.liquid-%}
         {%- include common/mathjax.liquid-%}
