@@ -1,3 +1,10 @@
+---
+layout: post
+title: "ext Generation Interface (TGI) Review"
+date: 2024-08-23 14:00:00 +0900
+categories: IT
+---
+
 # Text Generation Interface (TGI) Review
 
 [TGI](https://huggingface.co/docs/text-generation-inference/index)

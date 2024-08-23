@@ -5,6 +5,8 @@ theme: jekyll-theme-minimal
 baseurl: ""
 url: "https://dhihm.github.io"
 
+permalink: /:categories/:title/
+
 # debug:
 #   compress: true
 #   dist: false
