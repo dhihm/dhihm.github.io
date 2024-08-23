@@ -1,100 +1,32 @@
-# jekyll-rtd-theme
+---
+layout: default
+title: Thinking, Writing, and.
+---
 
-![CI](https://github.com/rundocs/jekyll-rtd-theme/workflows/CI/badge.svg?branch=develop)
-![jsDelivr](https://data.jsdelivr.com/v1/package/gh/rundocs/jekyll-rtd-theme/badge)
+# Thinking, Writing, and.
 
-Just another documentation theme compatible with GitHub Pages
+**"Thinking, Writing, and."에 오신 것을 환영합니다!**  
+이 블로그는 다양한 생각을 공유하고, 글을 쓰며, 비슷한 관심사를 가진 사람들과 교류하기 위해 만들어졌습니다.
+Software, 특히 LLM 관련된 내용에 대해 정리한 내용을 공유하고, 가끔은 살아가는 이이야기도 함께 나누고자 합니다.
 
-## What it does?
+---
 
-This theme is inspired by [sphinx-rtd-theme](https://github.com/readthedocs/sphinx_rtd_theme) and refactored with:
+## 최근 게시글
 
-- [@primer/css](https://github.com/primer/css)
-- [github-pages](https://github.com/github/pages-gem) ([dependency versions](https://pages.github.com/versions/))
+{% for post in site.posts limit:5 %}
+- [{{ post.title }}]({{ post.url }}) <small>({{ post.date | date: "%Y년 %m월 %d일" }})</small>
+{% endfor %}
 
-## Quick start
+[모든 게시글 보기]({{ site.baseurl }}/blog)
 
-```yml
-remote_theme: rundocs/jekyll-rtd-theme
-```
+---
 
-You can [generate](https://github.com/rundocs/starter-slim/generate) with the same files and folders from [rundocs/starter-slim](https://github.com/rundocs/starter-slim/)
+## 카테고리
 
-## Usage
+{% for category in site.categories %}
+- [{{ category[0] }}]({{ site.baseurl }}/categories#{{ category[0] }})
+{% endfor %}
 
-Documentation that can guide how to create with Github pages, please refer to [rundocs.io](https://rundocs.io) for details
+---
 
-## Features
-
-- Shortcodes (Toasts card, mermaid)
-- Pages Plugins (emoji, gist, avatar, mentions)
-- Auto generate sidebar
-- [Attribute List Definitions](https://kramdown.gettalong.org/syntax.html#attribute-list-definitions) (Primer/css utilities, Font Awesome 4)
-- Service worker (caches)
-- SEO (404, robots.txt, sitemap.xml)
-- Canonical Link (Open Graph, Twitter Card, Schema data)
-
-## Options
-
-| name          | default value        | description       |
-| ------------- | -------------------- | ----------------- |
-| `title`       | repo name            |                   |
-| `description` | repo description     |                   |
-| `url`         | user domain or cname |                   |
-| `baseurl`     | repo name            |                   |
-| `lang`        | `en`                 |                   |
-| `direction`   | `auto`               | `ltr` or `rtl`    |
-| `highlighter` | `rouge`              | Cannot be changed |
-
-```yml
-# folders sort
-readme_index:
-  with_frontmatter: true
-
-meta:
-  key1: value1
-  key2: value2
-  .
-  .
-  .
-
-google:
-  gtag:
-  adsense:
-
-mathjax: # this will prased to json, default: {}
-
-mermaid:
-  custom:     # mermaid link
-  initialize: # this will prased to json, default: {}
-
-scss:   # also _includes/extra/styles.scss
-script: # also _includes/extra/script.js
-
-translate:
-  # shortcodes
-  danger:
-  note:
-  tip:
-  warning:
-  # 404
-  not_found:
-  # copyright
-  revision:
-  # search
-  searching:
-  search:
-  search_docs:
-  search_results:
-  search_results_found: # the "#" in this translate will replaced with results size!
-  search_results_not_found:
-
-plugins:
-  - jemoji
-  - jekyll-avatar
-  - jekyll-mentions
-```
-
-## The license
-
-The theme is available as open source under the terms of the MIT License
+"Thinking, Writing, and."에 방문해 주셔서 감사합니다. 
