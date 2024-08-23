@@ -1,4 +1,4 @@
-# Text Generation Interface (TGI) Review 1
+# Text Generation Interface (TGI) Review
 
 [TGI](https://huggingface.co/docs/text-generation-inference/index)
 
