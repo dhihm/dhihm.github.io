@@ -22,6 +22,18 @@ layout: tasks/compress
         {%- include templates/sidebar.liquid -%}
         {%- include templates/content.liquid -%}
         {%- include templates/addons.liquid -%}
+
+        <!-- Utterances 댓글 시스템 추가 -->
+        <div id="utterances-comments"></div>
+        <script src="https://utteranc.es/client.js"
+                repo="dhihm/dhihm.github.io"
+                issue-term="pathname"
+                label="comments"
+                theme="github-light"
+                crossorigin="anonymous"
+                async>
+        </script>
+
         {%- include extra/body.html -%}
         {%- include rest/script.liquid -%}
         {%- include common/mermaid.liquid-%}

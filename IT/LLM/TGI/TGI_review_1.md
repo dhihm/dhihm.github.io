@@ -124,15 +124,8 @@ tensor의 각 차원에는 index가 있으며, 0부터 시작합니다.
 
 예를 들면, 위의 [batch_size, num_feature] 형태를 갖고, [2, 3] 크기의 tensor A, B가 있을 때,
 
-\[
-A = \begin{pmatrix}
-a_{11} & a_{12} & a_{13} \\
-a_{21} & a_{22} & a_{23}
-\end{pmatrix}, \quad
-B = \begin{pmatrix}
-b_{11} & b_{12} & b_{13} \\
-b_{21} & b_{22} & b_{23}
-\end{pmatrix}
+\[ A = \begin{pmatrix} a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \end{pmatrix}, \quad
+   B = \begin{pmatrix} b_{11} & b_{12} & b_{13} \\ b_{21} & b_{22} & b_{23} \end{pmatrix}
 \]
 
 dim=0에서 연결하면 A와 B가 행 방향으로 붙게 되어 [4, 3] 크기의 tensor가 됩니다.
