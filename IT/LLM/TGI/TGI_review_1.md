@@ -1,4 +1,10 @@
-# Tensor Parallelism for faster inference on multiple GPUs
+---
+layout: post
+title: "Tensor Parallelism for faster inference on multiple GPUs"
+date: 2024-08-23 15:00:00 +0900
+categories: IT
+author: dh.ihm
+---
 
 Tensor Parallelism에 대해서 먼저 살펴 보겠습니다. 
 
@@ -18,25 +24,36 @@ tensor를 분할하여 여러 GPU에 분산하여 계산하면, 계산 속도를
 
 예를 들어, 두 개의 행렬 A와 B가 있다고 할 때:
 
-\[
-A = \begin{pmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{pmatrix}, \quad B = \begin{pmatrix} b_{11} & b_{12} \\ b_{21} & b_{22} \end{pmatrix}
-\]
+\\[
+A = \begin{bmatrix} 
+a_{11} & a_{12} \newline a_{21} & a_{22} 
+\end{bmatrix}, 
+\\quad 
+B = \begin{bmatrix} 
+b_{11} & b_{12} \newline b_{21} & b_{22} 
+\end{bmatrix}
+\\]
 
 A의 행과 B의 열을 각각 곱한 후 더해서 새로운 행렬 C를 만들어야 합니다. 
 
-\[
-C = A \times B = \begin{pmatrix} c_{11} & c_{12} \\ c_{21} & c_{22} \end{pmatrix}
-\]
+\\[
+C = A \\times B = \begin{bmatrix} 
+c_{11} & c_{12} \newline c_{21} & c_{22} 
+\end{bmatrix}
+\\]
 
 여기서:
 
-\[
-c_{11} = a_{11} \times b_{11} + a_{12} \times b_{21}, \quad c_{12} = a_{11} \times b_{12} + a_{12} \times b_{22}
-\]
-\[
-c_{21} = a_{21} \times b_{11} + a_{22} \times b_{21}, \quad c_{22} = a_{21} \times b_{12} + a_{22} \times b_{22}
-\]
-
+\\[
+c_{11} = a_{11} \\times b_{11} + a_{12} \\times b_{21}, 
+\\quad 
+c_{12} = a_{11} \\times b_{12} + a_{12} \\times b_{22}
+\\]
+\\[
+c_{21} = a_{21} \\times b_{11} + a_{22} \\times b_{21}, 
+\\quad 
+c_{22} = a_{21} \\times b_{12} + a_{22} \\times b_{22}
+\\]
 
 이 계산을 하나의 GPU가 혼자 한다고 생각하면, time(C_{11}) + time(C_{12}) + time(C_{21}) + time(C_{22}) 시간이 걸릴 것입니다.
 
@@ -46,10 +63,10 @@ c_{21} = a_{21} \times b_{11} + a_{22} \times b_{21}, \quad c_{22} = a_{21} \tim
 
 이 시간이 하나의 GPU에서 계산하는 것보다 훨신 짧을 거라는 것이죠. 
 
-- GPU 1: \( c_{11} = a_{11} \times b_{11} + a_{12} \times b_{21} \)
-- GPU 2: \( c_{12} = a_{11} \times b_{12} + a_{12} \times b_{22} \)
-- GPU 3: \( c_{21} = a_{21} \times b_{11} + a_{22} \times b_{21} \)
-- GPU 4: \( c_{22} = a_{21} \times b_{12} + a_{22} \times b_{22} \)
+- GPU 1: \\( c_{11} = a_{11} \\times b_{11} + a_{12} \\times b_{21} \\)
+- GPU 2: \\( c_{12} = a_{11} \\times b_{12} + a_{12} \\times b_{22} \\)
+- GPU 3: \\( c_{21} = a_{21} \\times b_{11} + a_{22} \\times b_{21} \\)
+- GPU 4: \\( c_{22} = a_{21} \\times b_{12} + a_{22} \\times b_{22} \\)
 
 여기에서 좀 더 생각해볼 문제가 있습니다. 각 GPU가 계산한 결과를 더하기 위해서는, GPU가 서로 통신을 해야 한다는 것이죠. 
 
@@ -122,31 +139,37 @@ tensor의 각 차원에는 index가 있으며, 0부터 시작합니다.
 
 그리고 torch.cat() 함수는, 여러 tensor를 지정된 차원에서 연결하여 하나의 tensor로 만들어주는 함수입니다.
 
-예를 들면, 위의 [batch_size, num_feature] 형태를 갖고, [2, 3] 크기의 tensor A, B가 있을 때,
+예를 들면, 위의 `[batch_size, num_feature]` 형태를 갖고, `[2, 3]` 크기의 tensor A, B가 있을 때,
 
-\[ A = \begin{pmatrix} a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \end{pmatrix}, \quad
-   B = \begin{pmatrix} b_{11} & b_{12} & b_{13} \\ b_{21} & b_{22} & b_{23} \end{pmatrix}
-\]
+\\[
+A = \begin{bmatrix} 
+a_{11} & a_{12} & a_{13} \newline a_{21} & a_{22} & a_{23} 
+\end{bmatrix}, 
+\\quad
+B = \begin{bmatrix} 
+b_{11} & b_{12} & b_{13} \newline b_{21} & b_{22} & b_{23} 
+\end{bmatrix}
+\\]
 
-dim=0에서 연결하면 A와 B가 행 방향으로 붙게 되어 [4, 3] 크기의 tensor가 됩니다.
+dim=0에서 연결하면 A와 B가 행 방향으로 붙게 되어 `[4, 3]` 크기의 tensor가 됩니다.
 
-\[
-\text{concat}(A, B, \text{dim}=0) = \begin{pmatrix}
-a_{11} & a_{12} & a_{13} \\
-a_{21} & a_{22} & a_{23} \\
-b_{11} & b_{12} & b_{13} \\
+\\[
+\\text{concat}(A, B, \\text{dim}=0) = \begin{bmatrix}
+a_{11} & a_{12} & a_{13} \newline
+a_{21} & a_{22} & a_{23} \newline
+b_{11} & b_{12} & b_{13} \newline
 b_{21} & b_{22} & b_{23}
-\end{pmatrix}
-\]
+\end{bmatrix}
+\\]
 
-dim=1에서 연결하면 열 방향으로 붙어서 [2, 6] 크기의 tensor가 됩니다.
+dim=1에서 연결하면 열 방향으로 붙어서 `[2, 6]` 크기의 tensor가 됩니다.
 
-\[
-\text{concat}(A, B, \text{dim}=1) = \begin{pmatrix}
-a_{11} & a_{12} & a_{13} & b_{11} & b_{12} & b_{13} \\
+\\[
+\\text{concat}(A, B, \\text{dim}=1) = \begin{bmatrix}
+a_{11} & a_{12} & a_{13} & b_{11} & b_{12} & b_{13} \newline
 a_{21} & a_{22} & a_{23} & b_{21} & b_{22} & b_{23}
-\end{pmatrix}
-\]
+\end{bmatrix}
+\\]
 
 이것의 의미는, dim=0에서 연결하면 결과 tensor들이 쌓이면서 batch size가 증가하고, dim=1에서 연결하면 같은 batch 내에서 각 feature들이 더해지면서 feature 크기가 커진다는 것이죠. 
 

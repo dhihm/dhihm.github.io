@@ -1,13 +1,12 @@
 ---
 layout: post
-title: "ext Generation Interface (TGI) Review"
+title: "Text Generation Interface (TGI) Review"
 date: 2024-08-23 14:00:00 +0900
 categories: IT
+author: dh.ihm
 ---
 
-# Text Generation Interface (TGI) Review
-
-[TGI](https://huggingface.co/docs/text-generation-inference/index)
+[TGI Document](https://huggingface.co/docs/text-generation-inference/index)
 
 TGI의 소개 페이지에서는 맨 처음 여러가지 최적화와 기능들을 구현했다고 말하고 있습니다. 
 그 중에서 다음 몇가지 항목들에 대한 리뷰를 하고 정리해보겠습니다.

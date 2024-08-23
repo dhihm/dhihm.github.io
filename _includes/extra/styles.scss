@@ -1,0 +1,28 @@
+/* Utterances iframe을 포함한 댓글 창 조정 */
+#utterances-comments {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 1; /* 다른 요소보다 위로 설정 */
+}
+
+iframe.utterances-frame {
+    flex: 1;
+    width: 100%;
+    max-width: 100%;
+    height: 100%; /* 부모 요소의 크기에 맞게 조정 */
+    border: none;
+    overflow: hidden;
+    position: relative;
+    z-index: 1; /* 다른 요소보다 위로 설정 */
+}
+
+/* 사이드바와 중첩되지 않도록 설정 */
+.sidebar-wrap {
+    z-index: 2; /* 사이드바가 댓글 창 위로 오도록 설정 */
+}

@@ -17,7 +17,7 @@ layout: tasks/compress
 
             gtag('config', 'G-SBZVDZZ3LB');
         </script>
-        
+
         {%- include common/metadata.liquid -%}
         {%- include common/title.liquid -%}
         {%- include common/twitter_cards.liquid -%}
@@ -27,24 +27,44 @@ layout: tasks/compress
         {%- include rest/styles.liquid -%}
         {%- include common/script.liquid -%}
         {%- include extra/head.html -%}
+
+        <!-- MathJax 설정 및 스크립트 -->
+        <script type="text/javascript">
+        MathJax = {
+            tex: {
+            inlineMath: [['\\(','\\)'], ['$', '$']],
+            displayMath: [['\\[','\\]'], ['$$','$$']],
+            processEscapes: true
+            },
+            options: {
+            skipHtmlTags: ['noscript', 'style', 'textarea', 'pre'],
+            }
+        };
+        </script>
+        <script type="text/javascript" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+        </script>
     </head>
     <body class="container">
         {%- include templates/sidebar.liquid -%}
         {%- include templates/content.liquid -%}
         {%- include templates/addons.liquid -%}
-        {%- include extra/body.html -%}
 
         <!-- Utterances 댓글 시스템 추가 -->
-        <div id="utterances-comments"></div>
-        <script src="https://utteranc.es/client.js"
-                repo="dhihm/dhihm.github.io"
-                issue-term="pathname"
-                label="comments"
-                theme="github-light"
-                crossorigin="anonymous"
-                async>
-        </script>
+        <!-- 댓글 시스템 로드 조건 -->
+        {% unless page.url == "/" %}
+            <div id="utterances-comments"></div>
+            <script src="https://utteranc.es/client.js"
+                    repo="dhihm/dhihm.github.io"
+                    issue-term="pathname"
+                    label="comments"
+                    theme="github-light"
+                    crossorigin="anonymous"
+                    async>
+            </script>
+        {% endunless %}
 
+        {%- include extra/body.html -%}
         {%- include rest/script.liquid -%}
         {%- include common/mermaid.liquid-%}
         {%- include common/mathjax.liquid-%}

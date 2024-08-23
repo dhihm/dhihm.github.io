@@ -2,8 +2,8 @@ title: Thinking, Writing, and.
 description: 했던 일들과 하고 있는 일들과 하고 싶은 일들에 대해서 씁니다
 
 theme: jekyll-theme-minimal
-baseurl: ""
 url: "https://dhihm.github.io"
+baseurl: ""
 
 permalink: /:categories/:title/
 
@@ -33,3 +33,8 @@ exclude:
   - package-lock.json
   - webpack.config.js
   - jekyll-rtd-theme.gemspec
+
+collections: []
+IT:
+  output: true
+  permalink: /:collection/:name/
