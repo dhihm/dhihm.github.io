@@ -1,3 +1,3 @@
-# file2
+# HW Accelerator - NVIDIA
 
 source: `{{ page.path }}`

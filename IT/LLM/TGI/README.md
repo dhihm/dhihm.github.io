@@ -1,3 +1,3 @@
-# file2
+# HW Accelerator
 
 source: `{{ page.path }}`
