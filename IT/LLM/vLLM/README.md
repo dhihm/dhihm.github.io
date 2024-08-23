@@ -1,3 +1,3 @@
-# TGI - Hugging Face
+# vLLM
 
 source: `{{ page.path }}`

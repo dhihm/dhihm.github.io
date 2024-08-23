@@ -1,3 +1,3 @@
-# TGI - Hugging Face
+# CUDA
 
 source: `{{ page.path }}`

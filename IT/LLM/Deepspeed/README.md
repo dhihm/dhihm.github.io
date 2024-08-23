@@ -1,3 +1,3 @@
-# TGI - Hugging Face
+# DeepSpeed
 
 source: `{{ page.path }}`

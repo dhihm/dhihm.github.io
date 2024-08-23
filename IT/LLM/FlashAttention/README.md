@@ -1,3 +1,3 @@
-# TGI - Hugging Face
+# Flash Attention
 
 source: `{{ page.path }}`
