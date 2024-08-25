@@ -38,3 +38,6 @@ collections: []
 IT:
   output: true
   permalink: /:collection/:name/
+Papers:
+  output: true
+  permalink: /:collection/:name/
