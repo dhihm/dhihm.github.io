@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "nference without Interference: Disaggregate LLM Inference for Mixed Downstream Workloads"
+title: "Inference without Interference: Disaggregate LLM Inference for Mixed Downstream Workloads"
 date: 2024-09-01 10:21:00 +0900
 categories: IT
 author: dh.ihm
