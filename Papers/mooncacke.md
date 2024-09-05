@@ -2,7 +2,7 @@
 layout: post
 title: "Mooncake: A KVCache-centric Disaggregated Architecture for LLM Serving"
 date: 2024-09-01 10:08:00 +0900
-categories: IT
+categories: Papers
 author: dh.ihm
 ---
 
