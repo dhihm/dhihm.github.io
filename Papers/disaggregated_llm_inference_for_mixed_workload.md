@@ -2,7 +2,7 @@
 layout: post
 title: "Inference without Interference: Disaggregate LLM Inference for Mixed Downstream Workloads"
 date: 2024-09-01 10:21:00 +0900
-categories: IT
+categories: Papers
 author: dh.ihm
 ---
 
