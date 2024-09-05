@@ -2,7 +2,7 @@
 layout: post
 title: "Efficient Memory Management for Large Language Model Serving with PagedAttention"
 date: 2024-09-01 10:08:00 +0900
-categories: IT
+categories: Papers
 author: dh.ihm
 ---
 
