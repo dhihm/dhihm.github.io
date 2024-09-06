@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Mooncake: A KVCache-centric Disaggregated Architecture for LLM Serving"
+title: "Megatron-LM: Efficient Large-Scale Language Model Training on GPU Clusters"
 date: 2024-09-05 19:29:00 +0900
 categories: Papers
 author: dh.ihm
@@ -23,7 +23,7 @@ host와 device memory 간 parameter 또는 tensor swap 관련해서 궁금한 �
 Billion-Scale Model Training.)
 
 
-![Fig.1](./images/megatron_figure1.jpb)
+![Fig.1](./images/megatron_figure1.jpg)
 
 
 ## 문제점
@@ -157,7 +157,7 @@ PipeMare, PipeDream, PipeDream-2BW와 같은 비동기 및 제한된 스테일�
 
 ### Comination of tensor and pipeline model parallelism
 
-![Fig.2](./images/megatron_figure2.jpb)
+![Fig.2](./images/megatron_figure2.jpg)
 
 위 그림에서 transformer layer1과 layer2는 각각 pipeline parallelism에 의해 여러 **pipeline MP partition**으로 나뉘어져 있습니다. 
 
@@ -174,6 +174,27 @@ Fig.3에서는 GPipe라는 스케줄링 방식을 통해 **microbatch**가 각 G
 그림에서 보면, forward pass가 끝난 후, backward pass가 시작되기 전에 pipeline bubble이 발생하고 있네요. 
 
 이 시간을 가능한 최소화하면 학습 속도를 향상 시킬 수 있게 되는 것이죠. 
+
+![Fig.4](./images/megatron_figure3.jpg)
+
+이 그림의 위쪽에서는 1 forward pass와 1 backword pass의 pipeline schedule에서 기본 schedule과 interleaved schedule을 비교 하고 있습니다. 
+
+기본 schedule에서는 각 GPU가 순차적으로 forward pass와 backward pass를 실행합니다. 
+
+device 1에서부터 4까지 각 device가 작업을 수행한 후, 다음 device가 해당 작업을 이어서 수행하고 있습니다. 
+
+각 device는 하나의 micro-batch를 처리하고 나면, 다음 micro-batch를 처리하기 전까지 idle 상태로 대기합니다. 
+
+이 기본 schedule 상황에서 pipeline flush가 발생했을 때 pipeline bubble이 커지고, 일부 device의 idle 시간이 길어지는 것을 볼 수 있습니다. 
+
+이 그림의 아래쪽에서는 interleaved schedule에 대해서 보여주고 있습니다. 
+
+각 device가 여러 개의 micro-batch를 처리하고 있네요. 각 device에 2개의 micro-batch가 할당 되었습니다. 
+
+각 device가 동시에 여러 stage를 처리하면서 pipeline bubble을 줄여, device의 idle 시간을 감소 시키고 있습니다. 
+
+이 interleaved schedule 방식에서는 pipeline flush가 더 빨리 발생하기 때문에, bubble의 크기가 작아 전체적인 schedule 효율성이 올라가게 되었습니다. 
+
 
 
 
