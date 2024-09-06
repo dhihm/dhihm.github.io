@@ -15,7 +15,9 @@ training에 필요한 시간이 길어지는 문제를 해결하기 위해서 �
 host와 device memory 간 parameter 또는 tensor swap 관련해서 궁금한 부분이 있었는데 관련 논문도 추후 리뷰해 보겠습니다. (ZeRO-Offload: Democratizing
 Billion-Scale Model Training.)
 
-Fig. 1 TBD
+
+![Fig.1](./images/megatron_figure1.jpb)
+
 
 ## 문제점
 
@@ -148,7 +150,7 @@ PipeMare, PipeDream, PipeDream-2BW와 같은 비동기 및 제한된 스테일�
 
 ### Comination of tensor and pipeline model parallelism
 
-Figure 2. TBD
+![Fig.2](./images/megatron_figure2.jpb)
 
 위 그림에서 transformer layer1과 layer2는 각각 pipeline parallelism에 의해 여러 **pipeline MP partition**으로 나뉘어져 있습니다. 
 
@@ -156,9 +158,7 @@ Figure 2. TBD
 
 개별 GPU는 tensor의 일부만 처리하게 되어 메모리 사용량이 줄어들고 병렬처리가 가능한 구조입니다. 
 
-Figure 3. TBD
-
-이 그림은 GPipe라는 스케줄링 방식을 통해 **microbatch**가 각 GPU에서 처리되는 방식과 그 과정에서 발생하는 **pipeline bubble**을 보여주고 있습니다. 
+Fig.3에서는 GPipe라는 스케줄링 방식을 통해 **microbatch**가 각 GPU에서 처리되는 방식과 그 과정에서 발생하는 **pipeline bubble**을 보여주고 있습니다. 
 
 각 숫자는 micro-batch를 나타내고, 각 GPU가 서로 다른 micro-batch를 처리하네요. 
 
