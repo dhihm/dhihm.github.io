@@ -6,8 +6,7 @@ categories: Papers
 author: dh.ihm
 ---
 
-https://arxiv.org/pdf/2104.04473
-
+[Megatron-LM: Efficient Large-Scale Language Model Training on GPU Clusters](https://arxiv.org/pdf/2104.04473)
 
 이 논문에서는 LLM model이 점점 커지면서, GPU 메모리 제한 때문에 다중 GPU 서버를 쓰더라도 model을 구동할 수 없고, 
 
@@ -135,6 +134,7 @@ Megatron-LM에 대한 소개도 살짝 하고 있네요. 대규모 NLP 학습의
 
 ## Model Parallelism
 
+
 ### Data Parallelism
 
 Data parallelism은 각 GPU가 model의 전체 복사본을 가지고 있고, input data set이 여러 GPU에 분할(shard)되어 제공됩니다. 
@@ -148,7 +148,7 @@ Data parallelism은 각 GPU가 model의 전체 복사본을 가지고 있고, in
 즉, data parallelism의 중요한 개념은 각 GPU가 동일한 모델을 갖고 동작한다는 것 보다는, 각 GPU가 동일한 데이터 분할 방식을 적용하고, 동일한 학습 과정을 수행한다는 것이 되겠네요. 
 
 
-### Async / Sync 
+### Async? / Sync?
 
 PipeMare, PipeDream, PipeDream-2BW와 같은 비동기 및 제한된 스테일니스(bounded-staleness) 방식은 pipeline flush를 없애고, 
 
@@ -165,35 +165,121 @@ PipeMare, PipeDream, PipeDream-2BW와 같은 비동기 및 제한된 스테일�
 
 개별 GPU는 tensor의 일부만 처리하게 되어 메모리 사용량이 줄어들고 병렬처리가 가능한 구조입니다. 
 
-Fig.3에서는 GPipe라는 스케줄링 방식을 통해 **microbatch**가 각 GPU에서 처리되는 방식과 그 과정에서 발생하는 **pipeline bubble**을 보여주고 있습니다. 
+Fig.3에서는 [GPipe](https://dl.acm.org/doi/abs/10.5555/3454287.3454297)라는 스케줄링 방식을 통해 **micro-batch**가 각 GPU에서 처리되는 방식과 그 과정에서 발생하는 **pipeline bubble**을 보여주고 있습니다. 
 
-각 숫자는 micro-batch를 나타내고, 각 GPU가 서로 다른 micro-batch를 처리하네요. 
+각 숫자는 micro-batch를 나타내고, 각 GPU가 서로 다른 micro-batch를 처리하고 있음을 보여주고 있습니다.
 
 회색 부분이 pipeline bubble로, device들이 idle로 있는 시간을 나타냅니다. 
 
 그림에서 보면, forward pass가 끝난 후, backward pass가 시작되기 전에 pipeline bubble이 발생하고 있네요. 
 
-이 시간을 가능한 최소화하면 학습 속도를 향상 시킬 수 있게 되는 것이죠. 
+이 시간을 가능한 최소화하면 학습 속도를 향상 시킬 수 있게 되겠네요.
 
-![Fig.4](./images/megatron_figure3.jpg)
+이 그림에서는 1 forward pass와 1 backword pass의 pipeline schedule에서 기본 schedule과 interleaved schedule을 비교 하고 있습니다. 
 
-이 그림의 위쪽에서는 1 forward pass와 1 backword pass의 pipeline schedule에서 기본 schedule과 interleaved schedule을 비교 하고 있습니다. 
-
-기본 schedule에서는 각 GPU가 순차적으로 forward pass와 backward pass를 실행합니다. 
+default schedule(Gpipe)에서는 각 GPU가 순차적으로 forward pass와 backward pass를 실행합니다. 
 
 device 1에서부터 4까지 각 device가 작업을 수행한 후, 다음 device가 해당 작업을 이어서 수행하고 있습니다. 
 
 각 device는 하나의 micro-batch를 처리하고 나면, 다음 micro-batch를 처리하기 전까지 idle 상태로 대기합니다. 
 
-이 기본 schedule 상황에서 pipeline flush가 발생했을 때 pipeline bubble이 커지고, 일부 device의 idle 시간이 길어지는 것을 볼 수 있습니다. 
+즉, **하나의 batch 내 모든 micro-batch의 forward pass가 먼저 실행되고, 이후 모든 micro-batch의 backward pass가 실행**되는 schedule 방식입니다. 
 
-이 그림의 아래쪽에서는 interleaved schedule에 대해서 보여주고 있습니다. 
+이 default schedule 상황에서는 pipeline flush가 발생했을 때 pipeline bubble이 커지고, 일부 device의 idle 시간이 길어지는 것을 볼 수 있습니다. 
 
-각 device가 여러 개의 micro-batch를 처리하고 있네요. 각 device에 2개의 micro-batch가 할당 되었습니다. 
+Gpipe에서 pipeline parallelism 처리 시 bubble이 성능에 미치는 영향을 줄이기 위해서는 micro-batch의 수(𝑚)가 파이프라인 단계 수(𝑝)보다 훨씬 많아야 한다고 말하고 있습니다.  
 
-각 device가 동시에 여러 stage를 처리하면서 pipeline bubble을 줄여, device의 idle 시간을 감소 시키고 있습니다. 
+pipeline bubble을 𝑡𝑝𝑏, 이상적인 반복당 시간을 𝑡𝑖𝑑, 그리고 단일 micro-batch의 forward pass와 backward pass를 실행하는 데 걸리는 시간을 각각 𝑡𝑓와 𝑡𝑏라고 할 때, 
 
-이 interleaved schedule 방식에서는 pipeline flush가 더 빨리 발생하기 때문에, bubble의 크기가 작아 전체적인 schedule 효율성이 올라가게 되었습니다. 
+이 schedule에서 pipeline bubble은 batch의 시작에서 𝑝 − 1개의 forward pass와 batch의 끝에서 𝑝 − 1개의 backward pass로 구성됩니다.
+
+그림에서 좀 더 자세히 보면, 하나의 배치가 처리되는 동안 발생하는 bubble 구간은 총 3곳 입니다. 
+
+![pipeline bubble](./images/megatron_bubble.png)
+
+1번 구간을 보면, 1개의 forward pass가 수행되는 시간은 1 time (박스 1개) 이고, 모든 device가 forward pass를 시작하기까지 걸리는 시간이 총 3 time입니다. 
+
+즉 device 개수 (p - 1) time 만큼, backward pass pipeline이 시작되기 전에 device들이 idle 상태로 대기하는 구간이 발생하는 것입니다. 
+
+2번 구간은 2개의 idle 구간이 발생하는데, 모든 device에서 forward pass가 완료되고 나서, device 4에서 backward pass를 시작하기 까지 걸리는 시간 (3 time)과, 
+
+모든 device에서 backward pass pipeline 시작이 완료되는 시간까지 걸리는 시간 (2 time * 3)입니다. 
+
+논문에서 backward pass의 시간을 2 * forward pass라고 하고, pipeline 효율성이 이 시간 비율에는 의존하지 않는다고 한 부분 참고하세요.
+
+3번 구간은 backward pass가 모두 완료되고, 다음 batch가 시작되기 전까지의 시간을 나타내고 있습니다. 이 때에도 마찬가지로 (p - 1) time 만큼의 idle 시간이 발생합니다. 
+
+따라서 batch에 대한 이상적인 처리 시간은 **𝑡𝑖𝑑 = 𝑚·(𝑡𝑓 + 𝑡𝑏)**이 되는 것입니다. 
+
+
+다음으로 pipeline bubble에서 소비된 시간이 이상적인 계산 시간에 차지하는 비율을 살펴보겠습니다.
+
+pipeline bubble에 소비된 총 시간은 **𝑡𝑝𝑏 = (𝑝−1)·(𝑡𝑓 + 𝑡𝑏)**로 나타낼 수 있습니다.
+
+그렇기 때문에, 아래와 같이 말할 수 있게 됩니다. 
+
+The bubble time fraction is:
+
+$$
+\text{Bubble time fraction} = \frac{t_{pb}}{t_{id}} = \frac{(p - 1) \cdot (t_f + t_b)}{m \cdot (t_f + t_b)} = \frac{p - 1}{m}
+$$
+
+따라서 bubble time을 줄이려면, micro-batch의 수를 늘리거나, pipeline 단계를 최적화하는 것이 필요하겠죠. 
+
+micro-batch의 수가 많아지게 되면, pipeline이 효율적으로 채워지면서 bubble이 줄어 들 수 있지만, 반대로 pipeline 단계를 너무 많게 만들면 비효율적인 bubble이 발생할 수 있습니다. 
+
+따라서 pipeline bubble의 시간이 작아지려면 𝑚 ≫ 𝑝이어야 하는데요, 논문에서는 이렇게 언급하고 있습니다. 
+
+𝑚이 너무 커지게 되면, 즉 micro-batch의 수가 너무 많아지게되면, 메모리 사용량이 크게 늘어날 수 있습니다. 
+
+모든 micro-batch에 대해서 intermediate activations 같은 값들을 모드 memory에 저장해야 하기 때문입니다. 
+
+
+![Fig.4](./images/megatron_figure3.jpg)
+
+이 그림의 위쪽에서는, [PipeDream-Flush](https://arxiv.org/abs/2006.09503) 스케줄을 사용한 것을 보여주고 있습니다. 
+
+이 스케줄에서는 먼저 device들이 서로 다른 횟수의 forward pass를 수행하는 워밍업 단계를 거치며
+
+활성화 값을 유지해야 하는 micro-batch(역방향 패스가 완료되지 않아 활성화 값을 유지해야 하는 micro-batch)의 수를 
+
+pipeline의 depth만큼으로 제한합니다.
+
+워밍업 단계가 끝난 후, 각 device는 forward pass 하나와 backward pass 하나를 수행하는 안정 상태에 들어갑니다 (1F1B).
+
+batch가 끝나면 남은 모든 micro-batch에 대한 backward pass를 완료합니다.
+
+이 새로운 schedule에서 bubble에 소비되는 시간은 동일하지만, forward pass가 미완료된 micro-batch의 수는 pipeline 단계 수만큼으로 제한했기 때문에, 
+
+GPipe schedule과 비교했을 때 활성화 값을 저장해야 하는 micro-batch의 수가 p 개 이하로 줄어들게 되는 것이죠. (GPipe의 경우 마이크로배치 수는  m 개).
+
+따라서 마이크로배치 수가 파이프라인 단계 수보다 훨씬 많을 때, PipeDream-Flush는 GPipe보다 훨씬 메모리 효율적이게 됩니다. 
+
+
+Fig.4의 아래쪽에서는 **interleaved schedule**에 대해서 보여주고 있습니다. 
+
+pipeline bubble의 크기를 줄이기 위해 각 device가 여러 개의 layer 부분 집합 (model chunk)에 대한 계산을 수행할 수 있습니다. 
+
+일반적으로 한 device에서 layer 1개를 담당하도록 설정했지만, interleaved schedule에서는 각 device가 여러 layer를 처리하게 됩니다.
+
+이렇게 함으로써, 각 device가 여러 pipleline stage에 할당되고, 각 pipeline stage는 이전보다 적은 양의 계산을 수행하게 됩니다. 
+
+논문에서는 **batch 내 micro-batch의 수가 pipeline 단계의 정수 배**가 되어야 한다고 말하고 있는데요, 
+
+이는 모든 device가 동등하게 작업을 나누어 처리하기 위해서입니다. 
+
+모든 작업을 동등하게 나누지 않으면, 처리할 작업이 없는 device가 발생하고, 대기 시간이 발생하기 때문입니다. 
+
+이 schedule 방식의 단점도 함께 언급하고 있습니다. 
+
+pipeline bubble을 줄이는 대신 trade off로 통신량이 증가하게 되는 문제가 발생한다는 것입니다. 
+
+
+## Tensor Parallelism
+
+
+
+
 
 
 
